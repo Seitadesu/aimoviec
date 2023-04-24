@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-60GWGE93ET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-60GWGE93ET');
+</script>
+
+<meta property="og:title" content="Schoolforce" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="スクールフォース-chatGPTを用いて宿題を！" />
+<meta property="og:url" content="https://www.aisakkyoku.com/schoolforce" />
+<meta property="og:site_name" content="スクールフォース" />
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <!-- Bootstrap icons-->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />
+      <!-- Google fonts-->
+      <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
+      <!-- Core theme CSS (includes Bootstrap)-->
+
+      <link href="/static/css/styles.css" rel="stylesheet" />
+       <title>スクールフォース-chatGPTを用いて宿題を！</title>
+</head>
+<body>
+      <!-- Navigation-->
+      <nav class="navbar navbar-light bg-light static-top">
+          <div class="container text-center">
+            <a class="navbar-brand" href="/schoolforce">スクールフォース</a>
+          </div>
+      </nav>
+           <!-- Masthead-->
+        <header class="masthead masthead-back">
+            <div class="container position-relative">
+                <div class="row justify-content-center">
+                    <div class="col-xl-6">
+                        <div class="text-center text-white">
+                            <h3 class="mb-5">タイトル</h3>
+                            <h3 class="mb-5">「{{ title_text }}」<a href="{{ page_url }}"target="_blank"><i class="bi bi-link-45deg"></i></a></h3>
+                            <h4 class="mb-5">ストーリー</h4></div>
+                            <div class="text-white">
+                            <p class="mb-5"　id="code">{{ song_text_data }}</p></div>
+                            <div class="text-center text-white">
+
+                                     <!-- Masthead-->
+           <form class="form-subscribe" id="updateForm" action="/result_schoolforce" method="post" enctype="multipart/form-data">   
+            <input type="hidden" name="song_text_data" value="{{song_text_data}}" /> 
+            <input type="hidden" name="length_text" value="{{length_text}}">
+            <input type="hidden" name="term" value="{{term}}">
+            <input type="hidden" name="free_term" value="{{free_term}}">
+            <input type="hidden" name="keywords" value="{{keywords}}">
+            <input type="hidden" name="title" value="{{page_url}}">
+            <input type="hidden" name="language" value="{{language}}">
+            <input class="btn btn-success" id="submitButton2" type="submit" value="別の文章へ更新" style="margin-top: 10px;">
+</form>
+<p>呪文<br>
+条件:{{ term }}<br>自由な条件:{{ free_term }}<br>文字数:{{ length_text }}<br>キーワード:{{ keywords }}<br>言語:{{ language }}<br></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <body>
+        
+        <!-- Footer-->
+        <footer class="footer bg-light style=">
+          <div class="container" style="margin-bottom: 50px;">
+              <div class="row">
+                  <div class="col-lg-6 h-100 text-center text-lg-start my-auto" >
+                      <p class="text-muted small mb-4 mb-lg-0" >&copy; 2023- Seita    All Rights Reserved.<br> produced by Seita Nagai</p>
+                      <p class="text-muted small mb-4 mb-lg-0" id="scroll-target2" >お問い合わせはメール(nagasei4649@gmail.com)もしくは、twitter<a href="https://twitter.com/naasee613" target="_blank">Seita Nagai</a>のDMまでお願いします。</p>
+                  </div>
+              </div>
+          </div>
+        </footer>
+  
+
+<style>
+header.masthead {
+  position: relative;
+  background-color: #343a40;
+  background: url("static/natural.png") no-repeat center center;
+  background-size: cover;
+  padding-top: 8rem;
+  padding-bottom: 8rem;
+}
+</style>
+
+
+</html>

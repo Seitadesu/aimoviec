@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QS37D1BXX3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-QS37D1BXX3');
+</script>
+
+<meta property="og:title" content="AIサッキョク" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="AIサッキョク-今すぐAIで簡単に作詞-" />
+<meta property="og:url" content="https://www.aisakkyoku.com/" />
+<meta property="og:site_name" content="AIサッキョク" />
+<meta property="og:image" content="https://www.aisakkyoku.com/static/example_one.png" />
+
+<meta name=“twitter:card” content=“summary_large_image” />
+<meta name=“twitter:site” content=“@naasee613“ />
+<meta name=“twitter:title” content=“AIサッキョク“ />
+<meta name=“twitter:description” content=“AIサッキョク-今すぐAIで簡単に作詞-” />
+<meta name=“twitter:image” content=“https://www.aisakkyoku.com/static/example_one.png“ />
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <!-- Favicon-->
+      <link rel="icon" type="image/png" href="./static/icon_small_sukashi.png">
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+
+        <link href="/static/css/styles.css" rel="stylesheet" />
+         <title>AIサッキョク-今すぐAIで簡単に作詞-</title>
+</head>
+<body>
+        <!-- Navigation-->
+        <nav class="navbar navbar-light bg-light static-top">
+            <div class="container text-center">
+                <a class="navbar-brand" href="/"><img src="./static/logo_sukashi.png" class="logo_image" width="50%" height="50%"></a>
+            </div>
+        </nav>
+
+           <header class="masthead masthead-back">
+            <div class="container position-relative">
+                <div class="row justify-content-center">
+                    <div class="col-xl-6">
+                        <div class="text-center text-white">
+                            <h1 class="mb-2">AIサッキョク</h1>
+                            <h5>デモバージョン</h5>
+
+                            <p class="mb-5">AIサッキョクは、AI作詞ツールです。<br>タイトルと条件を入力するだけで、<br>AIが歌詞とジャケット画像を作成。</p>
+
+                            <form class="form-subscribe" id="contactForm"  action="/result" method="post" enctype="multipart/form-data">
+                              <div onclick="obj=document.getElementById('open').style; obj.display=(obj.display=='none')?'block':'none';">
+                                <a style="cursor:pointer;"><button type="button" class="btn btn-secondary my-2"><i class="bi bi-filter"></i>高度な条件</button></a>
+                              </div>
+                              
+                            
+
+                              <div id="open" style="display:none;clear:both;">
+                                <label for="select_composition" class="my-2">曲構成：</label>
+                                <select id="select_composition" name="composition" class="form-control form-control-sm">
+                                  <option value="Aメロ→Bメロ→サビ">Aメロ→Bメロ→サビ</option>
+                                  <option value="サビ→Aメロ→Bメロ→サビ">サビ→Aメロ→Bメロ→サビ</option>
+                                  <option value="Aメロ→Bメロ→サビ→Cメロ">Aメロ→Bメロ→サビ→Cメロ</option>
+                                  <option value="Aメロ→Bメロ→Cメロ→サビ">Aメロ→Bメロ→Cメロ→サビ</option>
+                                  <option value="サビ→Aメロ→サビ">サビ→Aメロ→サビ</option>
+                                </select>                   
+
+                                <label for="select_target" class="my-2">ターゲット層：</label>
+                                <select id="select_target" name="target" class="form-control form-control-sm">
+                                  <option value="10代女性">10代女性</option>
+                                  <option value="10代男性">10代男性</option>
+                                  <option value="20代女性">20代女性</option>
+                                  <option value="20代男性">20代男性</option>
+                                  <option value="30代女性">30代女性</option>
+                                  <option value="30代男性">30代男性</option>
+                                  <option value="40代女性">40代女性</option>
+                                  <option value="40代男性">40代男性</option>
+                                  <option value="50代女性">50代女性</option>
+                                  <option value="50代男性">50代男性</option>
+                                  <option value="60代女性">60代女性</option>
+                                  <option value="60代男性">60代男性</option>
+                                  <option value="70代女性">70代女性</option>
+                                  <option value="70代男性">70代男性</option>
+                                  <option value="80代女性">80代女性</option>
+                                  <option value="80代男性">80代男性</option>
+                                  <option selected value="幅広い年代">幅広い年代</option>
+                                </select>
+                                
+                                <label for="select_how" class="my-2">どんな曲：</label>
+                                <select id="select_how" name="how" class="form-control form-control-sm">
+                                  <option value="">--選択してください--</option>
+                                  <option value="恋愛">恋愛</option>
+                                  <option value="応援">応援</option>
+                                  <option value="社会への反発">社会への反発</option>
+                                  <option value="ロック">ロック</option>
+                                  <option value="アニメ">アニメ</option>
+                                  <option value="元気の出る">元気の出る</option>
+                                  <option value="ラップ">ラップ</option>
+                                  <option value="全部韻を踏むラップ">全部韻を踏むラップ</option>
+                                  <option value="別れ">別れ</option>
+                                  <option value="友情">友情</option>
+                                  <option value="悲しみ">悲しみ</option>
+                                  <option value="感動">感動</option>
+                                  <option value="春">春</option>
+                                  <option value="夏">夏</option>
+                                  <option value="秋">秋</option>
+                                  <option value="冬">冬</option>
+                                  <option value="卒業">卒業</option>
+                                  <option value="クリスマス">クリスマス</option>
+                                  <option value="詩的な">詩的な</option>
+                                  <option value="ギャグ">ギャグ</option>
+                                </select>
+                                
+                              
+                              <label for="select_conditions" class="my-2">条件：</label>
+                              <input type="text" list="conditions_list" id="select_conditions" name="conditions" class="form-control form-control-sm"placeholder="テキスト入力か選択">
+                              <datalist id="conditions_list" >
+                                  <option value="なるべく韻を踏んで">
+                                  <option value="全部韻を踏んで">
+                                  <option value="英語を入れて">
+                                  <option value="全部英語にして">
+                                  <option value="短めの歌詞にしたい">
+                                  <option value="キャッチーなフレーズを入れたい">
+                                  <option value="詩的な表現を入れたい">
+                                  <option value="切ない気持ちを表現したい">
+                                  <option value="力強い気持ちを表現したい">                                        
+                              </datalist>
+                              
+                              <label for="select_language" class="my-2">言語：</label>
+                              <select id="select_language" name="language" class="form-control form-control-sm">
+                                  <option value="日本語">日本語</option>
+                                  <option value="英語">英語</option>
+                                  <option value="中国語">中国語</option>
+                                  <option value="韓国語">韓国語</option>
+                                  <option value="スペイン語">スペイン語</option>
+                              </select>
+                              
+                              
+                              <label for="select_kewwords" class="my-2">キーワード：</label>
+                              <input maxlength="15" minlength="1" class="form-control form-control-sm" id="select_keywords" type="text" placeholder="キーワードを入力" name="keywords" 
+                              value="" />
+            
+                              <label for="select_color" class="my-2">文字の色：</label>                  
+                              <select id="select_color" name="select_color" class="form-control form-control-sm">
+                                  <option selected value="(255, 255, 255)"style="color:#FFFFFF;" >白</option> 
+                                  <option value="(0, 0, 0)">黒</option>
+                                  <option value="(255, 0, 0)"style="color:#FF0000;" >赤</option>
+                                  <option value="(255, 255, 0)"style="color:#FFFF00;" >黄</option>
+                                  <option value="(255, 100, 255)"style="color:#FF64FF;" >ピンク</option>
+                                  <option value="(128, 0, 128)"style="color:#800080;" >紫</option>
+                                  <option value="(0, 128, 0)"style="color:#008000;" >緑</option>
+                                  <option value="(0, 0, 255)" style="color:#0000FF;" >青</option>
+                                </select>
+            
+                                <label for="select_font" class="my-2">文字のフォント：</label>                      
+                                <select id="select_font" name="select_font" class="form-control form-control-sm">
+                                  <option selected value="a" style="font-family: sans-serif;" >ゴシック体</option>   
+                                  <option value="b" style="font-family: serif;">明朝体</option>       
+                                  <option value="c"  style="font-family: HG丸ｺﾞｼｯｸ体;">丸ゴシック体</option>
+                                </select>
+                          </div>     
+                              <div class="col">
+                                  <label for="select_song" class="my-2">曲名：</label>
+                                  <input maxlength="15" minlength="1" class="form-control form-control-lg" id="select_song" type="text" placeholder="曲名を入力してください" name="select_song" required value="" />
+                              </div>
+
+                          <div class="row justify-content-center"><div class="col-auto"><input class="btn btn-primary" id="submitButton" type="submit" value="generate song" style="margin-top: 10px;"></div>
+                          <div class="loader" style="margin-top: 10px;"></div></div>
+                          <p class="loader2 lead " style="margin-top: 5px; display:none;"></p>
+                          <button type="button" class="btn btn-info text-white" id="share-button" onclick="shareOnTwitter()" style="margin-bottom: 10px; margin-top: 20px;">シェア！<i class="bi bi-twitter"></i></button>    
+                              
+<style>                              
+                          .loader {
+border: 6px solid #f3f3f3;
+border-top: 6px solid #3498db;
+border-radius: 50%;
+width: 50px;
+height: 50px;
+animation: spin 1s linear infinite;
+display: none; /* 初期状態では非表示 */
+}
+
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
+
+/* ボタンがクリックされた時に.loaderを表示 */
+#submitButton:active + .loader {
+display: inline-block;
+}
+
+</style>
+<script>
+  const text = "約30秒で作詞・画像生成します。しばらくお待ちください。AIサッキョクでは、ユーザーが入力した曲名によって歌詞とジャケット画像をAIが作成します。AIサッキョクの目標は、誰もが音楽を自由に楽しめるようにすることです。そして、よりクリエイティブな社会になることを信じています。AIサッキョクでは、作詞で高度な条件を指定することができます。例えば、曲構成・ターゲット設定・どんな曲か・条件・言語・キーワード・文字の色・文字のフォント等です。ぜひお試しください。お待ちの間、AIジョークでもお聞きください。{{joke}}";
+  let i = 0;
+
+  const typing = () => {
+    if (i < text.length) {
+      document.querySelector(".loader2").innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typing, 100);
+    }
+  };
+
+  const loader2 = document.querySelector(".loader2");
+  loader2.style.display = "none"; // hide loader2 initially
+
+  const submitButton = document.getElementById("submitButton");
+  submitButton.addEventListener("click", function() {
+    const loader = document.querySelector(".loader");
+    loader.style.display = "inline-block"; // show loader
+
+    setTimeout(function() {
+      loader2.style.display = "block"; // show loader2 after 1 second
+      setTimeout(typing, 1000); // start typing after 1 second
+    }, 1000);
+  });
+</script>
+                              
+<style>
+  @media screen and (max-width: 480px) {
+  .loader2 {
+    display: block;
+  }
+}
+
+</style>
+                             
+
+
+                                      
+                  </div>
+              </div>
+          </form>
+          
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>   
+        
+
+            <section class="py-5">
+              <div class="container px-5">
+                  <div class="row justify-content-center">
+                      <div class="col-lg-8 col-xxl-6">
+                          <div class="text-center my-5">
+                              <h2 class="fw-bolder mb-3">AIサッキョクを使えば、AIが一瞬で<br>歌詞とジャケット画像を作成します</h2>
+                              <p class="lead fw-normal text-muted mb-4">AIサッキョクの目標は、誰もが音楽を自由に楽しめるようにすることです。デモバージョンでは、作詞とジャケット画像の作成機能のみですが、今後は作曲・MV・グッズなども作成できるサービスになります。</p>
+                              <a class="btn btn-primary btn-lg" href="#scroll-target">作詞と写真の例を見る</a>
+                              <a class="btn btn-secondary btn-lg" href="#scroll-target2">お問い合わせ</a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+            </section>
+          <!-- About section one-->
+          <section class="py-5 bg-light " id="scroll-target">           
+              <div class="container px-5 my-5">
+                  <div class="row gx-5 align-items-center">
+                      <div class="col-lg-6"><img class="img-fluid rounded mb-5 mb-lg-0" src="/static/example_one.png" alt="..." /></div>
+                      <div class="col-lg-6">
+                          <h2 class="fw-bolder">「海辺のピアノ」</h2>
+                          <p class="lead fw-normal text-muted mb-0">Aメロ<br>
+                            海辺のピアノが 優しく語る 二人の夢が<br>
+                            今は遠く離れ 君の声が聞こえない<br>
+                            
+                            Bメロ<br>
+                            僕はまだ恋を知らないまま 君を想いながら<br>
+                            そっと手を取り 君を見つめた<br>
+                            
+                            サビ<br>
+                            夕暮れの記憶 消えないでいて<br>
+                            君を想いながら 泣いていた<br>
+                            また会える日まで そばにいるように<br>
+                            そっと祈るから 今日もまたGood Bye</p>
+                      </div>
+                  </div>
+              </div>
+          </section>
+          <!-- About section two-->
+          <section class="py-5">
+              <div class="container px-5 my-5">
+                  <div class="row gx-5 align-items-center">
+                      <div class="col-lg-6 order-first order-lg-last"><img class="img-fluid rounded mb-5 mb-lg-0" src="/static/example_two.png" alt="..." /></div>
+                      <div class="col-lg-6">
+                          <h2 class="fw-bolder">「宇宙に行けたら」</h2>
+                          <p class="lead fw-normal text-muted mb-0">Aメロ<br>
+                            夢見てた 小さな頃から<br>
+                            宇宙に行けたら 何が見えるのかな<br>
+                            
+                            Bメロ<br>
+                            今 いつもの街を抜け出して<br>
+                            どんな世界が広がっているのかな<br>
+                            
+                            Cメロ<br>
+                            高く 高く 飛び立って<br>
+                            その星に 希望を届けたい<br>
+                            
+                            サビ<br>
+                            抱える苦しみの向こう側へ<br>
+                            誰もが 夢を叶えるために<br>
+                            宇宙へ そっと 飛んでゆけ<br>
+                            その瞳に 希望を輝かせよう</p>
+                      </div>
+                  </div>
+              </div>
+          </section>
+          
+          <iframe src="https://www.aisakkyoku.com/seita" width="100%" height="900px" frameborder="0"></iframe>
+    
+
+<style>
+header.masthead {
+  position: relative;
+  background-color: #343a40;
+  background: url("/static/robot_sakushi2.png") no-repeat center center;
+  background-size: cover;
+  padding-top: 8rem;
+  padding-bottom: 8rem;
+}
+</style>
+
+<script>
+  function shareOnTwitter() {
+  var tweetText = 'AIが一瞬で作詞！今すぐ試そう！＃AIサッキョク';
+  var shareURL = 'https://www.aisakkyoku.com';
+  var shareLink = 'https://twitter.com/intent/tweet?text=' + tweetText + '&url=' + shareURL;
+  window.open(shareLink);
+            }
+</script> 
+
+      
+    </body>
+
+</html>
