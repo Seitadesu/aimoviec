@@ -204,7 +204,7 @@ def shop_page(max_id):
             host="localhost",
             database="moviec",
             user="postgres",
-            password="seisei178"
+            password="・・・"
         )
 
         cur = conn.cursor()
