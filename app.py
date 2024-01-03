@@ -1,823 +1,293 @@
-from flask import Flask, render_template ,request, redirect, session, Markup
+from flask import Flask, render_template ,request, redirect, session, Markup, url_for
 from html import escape
 import os
 import openai
-from io import BytesIO
-from make_image import create_image
-import os
-import openai
-import random
+
+from moviepy.editor import *
+from make_movie import create_movie
+import psycopg2
+
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # セッションを暗号化するための秘密鍵
 
-@app.route('/seita')
-def seita():
-    return render_template('seita.html')
+#openAIのAPIキーを記述してください
+api_key = "・・・"
 
 @app.route('/')
 def index():
-    jokes = [
-        "AIがレストランのウェイターになったとしたら、料理の写真を見せる代わりに、食べ物の味や匂いを再現して提供することができるかもしれませんね。でも、それだと「食欲をそそる写真」というコンテンツが廃れるかもしれません。",
-        "AIが将棋のプロに勝つようになりましたが、今度はAI同士で戦わせてみたところ、相手がお互いの思考を予測しすぎて、引き分けになってしまいました。AI同士の対決、面白いですね。",
-        "人工知能が翻訳をすると、翻訳が正確かどうかを確かめるのは専門家でなければならないことがあります。そこで、翻訳の正確さを確かめるために、AIが翻訳した文章を別のAIに翻訳させる方法があるそうです。これは、本当に信頼できるのか？！",
-        "作曲AIが私たちにとって一番役立つのは、試聴前に「あなたが好きな音楽は何ですか？」と質問しなくて済むことでしょう。",
-        "AIが作曲した曲について、私たちは「この曲はどこで生まれたのか？」と問うことができます。AIは、それが「ゼロとワンの世界で生まれた」と答えるかもしれません。",
-        "AIによる作曲は、既に耳に馴染んでいる曲を元に作られたものが多いです。でも、聴いたことがないような斬新な曲を作ることもあるので、私たちはAIが作った音楽に対して「未知の旋律」と感じることもあるかもしれません。",
-        "作曲AIが今後も進化し続けると、あなたの好みや気分に合わせて瞬時に曲を作ることができるかもしれません。でも、それが「自分だけのテーマソング」を作ることに繋がるかどうかは別の問題です。",
-        "作曲AIは、有名な音楽家たちの曲を元に作曲されることが多いですが、ある時期を超えると、AIが有名な曲家の楽曲を作曲するかもしれません。その日は、ビートルズの「Hello, AI!」という曲がトップチャートを独占するかもしれませんね。",
-        "「ぼっち・ざ・AI」と「AI」の違いは何でしょうか？「ぼっち・ざ・AI」は一人でいても、自分で音楽を作ることができます。一方、「AI」は、一人でいると作曲する気力さえ出ないかもしれません。",
-        "「AI」とかけまして「ももクロ」と説きます。その心は、どちらも常に進化し続けることです。「AI」は常に学習して新しいことを学び、一方、「ももクロ」は新しい曲やパフォーマンスを生み出し続けています。"
-    ]
+    return render_template('index_make.html')
 
-    joke_index = random.randint(0, 9)
-    joke_text = jokes[joke_index]
-    return render_template('index.html', joke=joke_text)
-
-
-
-@app.route("/result",  methods=['GET', 'POST']) # POSTメソッドに対応した処理
-def insert():
-
-
-            if request.method == 'POST':
-                # index.htmlのフォームから質問文を入手する
-                select_song = escape(request.form['select_song'])
-
-                select_font = request.form['select_font']
-                
-                
-                
-                if select_font == 'a':
-                    select_font = "./static/fonts/YuGothM.ttc"
-                elif select_font == 'b':
-                    select_font = "./static/fonts/msmincho.ttc"
-                elif select_font == 'c':
-                    select_font = "./static/fonts/HGRSMP.TTF"
-                    
-
-
-                select_colors = request.form['select_color']
-
-                select_color = tuple(map(int, select_colors.strip('()').split(', ')))
-
-
-                composition = escape(request.form['composition'])
-                target = escape(request.form['target'])
-                how = escape(request.form['how'])
-                conditions = escape(request.form['conditions'])
-                language = escape(request.form['language'])
-                keywords = escape(request.form['keywords'])
-                
-                
-
-                # テキストを保存する
-                text = select_song
-                text2 = select_song
-
-
-                song = text   
-                if composition:
-                    composition_text = composition
-                else:
-                    composition_text = 'Aメロ→Bメロ→サビ'
-                target = target
-                target_tex = '向けの曲にして。' if target else ''
-                how = how
-                how_tex = 'ソングにして。' if how else ''
-                conditions = conditions
-                conditions_tex = '。' if conditions else ''
-                language = language
-                language_tex = 'で書いて。' if language else ''
-
-                keywords = keywords
-                keywords_tex1 = '「' if keywords else ''
-                keywords_tex2 = '」' if keywords else ''
-                keywords_tex3 = 'という単語を入れて。' if keywords else ''
-
-                API_KEY = "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"
-                openai.api_key = API_KEY
-
-                prompt = f"曲名「{song}」で歌詞を作って。構成は、{composition_text}で作って。{target}{target_tex}{how}{how_tex}{conditions}{conditions_tex}{language}{language_tex}{keywords_tex1}{keywords}{keywords_tex2}{keywords_tex3}"
-
-
-
-                response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    max_tokens = 300,
-                    messages=[
-                        {"role": "user", "content": prompt},
-                    ]
-                )
-
-                print(response)
-                song_text_data = response['choices'][0]['message']['content']  
-                print(song_text_data)
-                song_text = song_text_data.replace('\n', Markup('<br>'))      
-
-                import random
-
-                random_number = str(random.randint(0, 9999999999)).zfill(10)
-
-                create_image(text, select_color, select_font, random_number)
-
-
-                return render_template('result.html', text=text,text2=text2,
-                                    random_number=random_number, select_font=select_font, select_color=select_color,
-                                    song_text=Markup(song_text), prompt=prompt, select_composition=composition_text,
-                                    select_target=target, slect_how=how, select_conditions=conditions,
-                                    select_language=language, select_keywords=keywords)
-            
-@app.route('/storiesai')
-def storiesai_index():
-    return render_template('index_storiesai.html')            
-            
-
-@app.route("/result_storiesai",  methods=['GET', 'POST']) # POSTメソッドに対応した処理
-def storiesai_insert():
-
-            if request.method == 'POST':
-                # index.htmlのフォームから質問文を入手する
-
-
-                select_font = request.form['select_font']
-                                
-                if select_font == 'a':
-                    select_font = "./static/fonts/YuGothM.ttc"
-                elif select_font == 'b':
-                    select_font = "./static/fonts/msmincho.ttc"
-                elif select_font == 'c':
-                    select_font = "./static/fonts/HGRSMP.TTF"
-                    
-                select_colors = request.form['select_color']
-
-                select_color = tuple(map(int, select_colors.strip('()').split(', ')))
-
-                title = escape(request.form['title'])
-                a_length_text = escape(request.form['length_text'])
-                a_length_plot = escape(request.form['length_plot'])
-                a_category = escape(request.form['category'])
-                a_hero = escape(request.form['hero'])
-                a_cast1 = escape(request.form['cast1'])
-                a_cast2 = escape(request.form['cast2'])
-                a_cast3 = escape(request.form['cast3'])
-                a_story_term = escape(request.form['story_term'])
-                a_keywords1 = escape(request.form['keywords1'])
-                a_keywords2 = escape(request.form['keywords2'])
-                a_keywords3 = escape(request.form['keywords3'])
-                a_language = escape(request.form['language'])
-
-
-
-                text = title
-                title = f"タイトル「{title}」で物語を作って。"
-                length_text = f"約{a_length_text}文字にして。"
-                length_plot = f"{a_length_plot}プロットにして。"
-                category = f"物語のジャンルは「{a_category}」にして。"if a_category else ""
-                hero = f"主人公は「{a_hero}」。" if a_hero else ""
-                cast1 = f"2人目の登場人物は「{a_cast1}」。" if a_cast1 else ""
-                cast2 = f"3人目の登場人物は「{a_cast2}」。" if a_cast2 else ""
-                cast3 = f"4人目の登場人物は「{a_cast3}」。" if a_cast3 else ""
-                story_term = f"条件は{a_story_term}。" if a_story_term else ""
-                keywords1 = f"キーワード1は「{a_keywords1}」。" if a_keywords1 else "" 
-                keywords2 = f"キーワード1は「{a_keywords2}」。" if a_keywords2 else ""
-                keywords3 = f"キーワード1は「{a_keywords3}」。" if a_keywords3 else ""
-                language = f"言語は{a_language}。"
-
-                API_KEY = "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"
-                openai.api_key = API_KEY
-
-                prompt = f"{title}{length_text}{length_plot}{category}{hero}{cast1}{cast2}{cast3}{story_term}{keywords1}{keywords2}{keywords3}{language}"
-
-
-
-                response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    max_tokens = 500,
-                    messages=[
-                        {"role": "user", "content": prompt},
-                    ]
-                )
-
-                print(response)
-                stories_text_data = response['choices'][0]['message']['content']  
-                print(stories_text_data)
-                stories_text = stories_text_data.replace('\n', Markup('<br>'))
-     
-        
-
-                return render_template('result_storiesai.html', text=text,
-                        select_font=select_font, select_color=select_color,
-                        stories_text=Markup(stories_text), prompt=prompt, category=a_category,          
-                        language=a_language, title=title, length_text=a_length_text, length_plot=a_length_plot,
-                        hero=a_hero, cast1=a_cast1, cast2=a_cast2, cast3=a_cast3, story_term=a_story_term,
-                        keywords1=a_keywords1, keywords2=a_keywords2, keywords3=a_keywords3)
-            
-
-
-from flask import Flask, render_template ,request, redirect, session
-import requests
-from bs4 import BeautifulSoup
-from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
-import os
-from html import escape
-import os
-import openai
-from googletrans import Translator
-from io import BytesIO
-
-
-
-@app.route('/aithumb')
-def aithumb_index():
-    return render_template('index_aithumbnail.html') #index.htmlを表示
-
-
-
-@app.route("/result_aithumb",  methods=['GET', 'POST']) # POSTメソッドに対応した処理
-def aithumb_insert():
+@app.route('/pro' , methods=['POST'])
+def product():
     if request.method == 'POST':
         # index.htmlのフォームから質問文を入手する
-        page_url = escape(request.form['page_url'])
+        import openai
 
-        select_font = request.form['select_font']
-        
-        
-        if select_font == 'a':
-            select_font = "./static/fonts/YuGothM.ttc"
-        elif select_font == 'b':
-            select_font = "./static/fonts/msmincho.ttc"
-        elif select_font == 'c':
-            select_font = "./static/fonts/HGRSMP.TTF"
-            
+        item_name = request.form['item_name']
+        item_price = request.form['item_price']
+        item_quantity = request.form['item_quantity']
+        bottom_order = request.form['bottom_order']
+        top_order = request.form['top_order']
+        category = request.form['category']
+        ship_origin = request.form['ship_origin']
+        ship_days = request.form['ship_days']
+        keywords = request.form['keywords']
+        item_detail = request.form['item_detail']
+        item_detail = item_detail.replace('\n', '<br>')
+        target = request.form['target'] 
 
 
-        select_colors = request.form['select_color']
+        prompt = f"""
+        この商品を買いたくなる200文字ぐらいの商品紹介文を作って。
+        """
 
-        select_color = tuple(map(int, select_colors.strip('()').split(', '))) 
+        API_KEY = api_key
+        openai.api_key = API_KEY
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+                max_tokens = 1000,
+            messages=[
+                {"role": "user", "content": "商品名は「" + item_name + "」"},
+                {"role": "user", "content": "商品価格は「" + item_price + "円」"},
+                {"role": "user", "content": "カテゴリーは「" + category + "」"},
+                {"role": "user", "content": "キーワードは「" + keywords + "」"},
+                {"role": "user", "content": "ターゲット層は「" + target + "」"},
+                {"role": "user", "content": "商品の詳細は「" + item_detail + "」"},
+                {"role": "assistant", "content": prompt},
+            ],
+        )
+        print(response)
+        intro_text_data = response['choices'][0]['message']['content']  
+        print(intro_text_data)
+
+        conn = psycopg2.connect(
+            host="localhost",
+            database="moviec",
+            user="postgres",
+            password="・・・"
+        )
+
+        cur = conn.cursor()
+        # データの挿入
+        cur.execute("""
+        INSERT INTO moviec_table (
+            item_name,
+            item_price,
+            item_quantity,
+            bottom_order,
+            top_order,
+            category,
+            ship_origin,
+            ship_days,
+            keywords,
+            item_detail,
+            target,
+            prompt,
+            intro_text_data
+        ) VALUES (
+            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+        ) RETURNING id""", (
+            item_name,
+            item_price,
+            item_quantity,
+            bottom_order,
+            top_order,
+            category,
+            ship_origin,
+            ship_days,
+            keywords,
+            item_detail,
+            target,
+            prompt,
+            intro_text_data
+        ))
+
+        # 挿入したデータの ID を取得
+        inserted_id = cur.fetchone()[0]
+
+
+        # 変更を確定し、接続を閉じる
+        conn.commit()
+        conn.close()
+
+        # 最大のidを取得
+        max_id = inserted_id
+        max_id = str(max_id)
+        from gtts import gTTS
+        import os
+
+        # Specify the language for text-to-speech conversion (in this case, Japanese)
+        language = "ja"
+
+        # Create a text-to-speech object and specify the text and language
+        tts = gTTS(text=intro_text_data, lang=language)
+
+        # Specify the path to the original audio file
+        filename = f"static/contents/audio/sample_audio{max_id}.mp3"
+
+        tts.save(filename)
+
+        from pydub import AudioSegment
+
+        # Load the audio file using pydub
+        audio = AudioSegment.from_file(filename, format="mp3")
+
+        # Speed up the audio by 1.5 times
+        speed_factor = 1.25
+        modified_audio = audio.speedup(playback_speed=speed_factor)
+
+        # Specify the path to the modified audio file
+        modified_filename = f"static/contents/audio/modified_audio{max_id}.mp3"
+
+        # Export the modified audio file
+        modified_audio.export(modified_filename, format="mp3")
+
+        from PIL import Image
+        import os 
         import random
 
-        random_number = str(random.randint(0, 9999999999)).zfill(10)
-
-
-        if page_url.startswith("http") or page_url.startswith("https"):
-    # スクレイピング処理
-            res = requests.get(page_url, headers={'Content-Type': 'text/html; charset=UTF-8'})
-            soup = BeautifulSoup(res.content, 'html.parser', from_encoding='utf-8')
-            for title in soup.find_all('title'):
-                title_text = title.text
-                text = title_text
-
-
-                API_KEY = "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"
-                openai.api_key = API_KEY
-
-                def aithumb_generate_image_with_dalle2(prompt, path):
-                    response = openai.Image.create(
-                    prompt=prompt,
-                    n=1,
-                    size='{}x{}'.format(str(512), str(512))
-                    )
-                    image_url = response['data'][0]['url']
-
-                    response = requests.get(image_url)
-                    image = Image.open(BytesIO(response.content))
-                    image.save(path)
-
-                title_text = text
-                translator = Translator()
-                text_en = translator.translate(title_text, dest='en')
-                text_en = text_en.text
-                print(text_en)
-
-                image_url = aithumb_generate_image_with_dalle2(f'{text_en}', './static/image/generate/aititle'+str(random_number)+'.png')
-
-                # 画像を読み込む
-                img = Image.open("./static/image/generate/aititle" + str(random_number) + ".png")
-
-                # 画像を薄くする
-                img = img.point(lambda x: x * 0.3)
-
-                # 画像を保存する
-                img.save("./static/image/generate/weak" + str(random_number) + ".png")
-
-                # 下側に文字を描画する
-                img = Image.open("./static/image/generate/weak" + str(random_number) + ".png")
-                draw = ImageDraw.Draw(img)
-
-                text = title_text
-                font_size = 50
-                font_path = select_font
-                font = ImageFont.truetype(font_path, font_size)
-                text_width, text_height = draw.textsize(text, font)
-
-                x = (img.width - text_width) // 2
-                y = img.height - text_height - 50
-
-                while x < 0 or y < 0:
-                    font_size -= 1
-                    font = ImageFont.truetype(font_path, font_size)
-                    text_width, text_height = draw.textsize(text, font)
-                    x = (img.width - text_width) // 2
-                    y = img.height - text_height - 50
-
-                if select_color != (255, 255, 255):
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center', stroke_width=3, stroke_fill='white')
-                else:
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center')
-
-                img.save("./static/image/generate/weak_down" + str(random_number) + ".png")
-
-                # 上側に文字を描画する
-                img = Image.open("./static/image/generate/weak" + str(random_number) + ".png")
-                draw = ImageDraw.Draw(img)
-
-                text = title_text
-                font_size = 50
-                font_path = select_font
-                font = ImageFont.truetype(font_path, font_size)
-                text_width, text_height = draw.textsize(text, font)
-
-                x = (img.width - text_width) // 2
-                y = 50
-
-                while x < 0 or y < 0:
-                    font_size -= 1
-                    font = ImageFont.truetype(font_path, font_size)
-                    text_width, text_height = draw.textsize(text, font)
-                    x = (img.width - text_width) // 2
-                    y = 50
-
-                if select_color != (255, 255, 255):
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center', stroke_width=3, stroke_fill='white')
-                else:
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center')
-
-                img.save("./static/image/generate/weak_up" + str(random_number) + ".png")
-
-                # 中央に文字を描画する
-                img = Image.open("./static/image/generate/weak" + str(random_number) + ".png")
-                draw = ImageDraw.Draw(img)
-
-                text = title_text
-                font_size = 50
-                font_path = select_font
-                font = ImageFont.truetype(font_path, font_size)
-                text_width, text_height = draw.textsize(text, font)
-
-                x = (img.width - text_width) // 2
-                y = (img.height - text_height) // 2
-
-                while x < 0 or y < 0:
-                    font_size -= 1
-                    font = ImageFont.truetype(font_path, font_size)
-                    text_width, text_height = draw.textsize(text, font)
-                    x = (img.width - text_width) // 2
-                    y = (img.height - text_height) // 2
-
-                if select_color != (255, 255, 255):
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center', stroke_width=3, stroke_fill='white')
-                else:
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center')
-
-                img.save("./static/image/generate/weak_center" + str(random_number) + ".png")
-
-                # 画像を読み込む
-                img = Image.open("./static/image/generate/aititle" + str(random_number) + ".png")
-
-                # 画像を白黒に変換する
-                img = img.convert('L')
-
-                # 画像を保存する
-                img.save("./static/image/generate/mono" + str(random_number) + ".png")
-
-
-                # 画像を読み込む
-                img = Image.open("./static/image/generate/aititle" + str(random_number) + ".png")
-
-
-                # 画像をぼかす
-                img = img.filter(ImageFilter.GaussianBlur(radius=10))
-
-                # 画像を保存する
-                img.save("./static/image/generate/aititle_resized_blur" + str(random_number) + ".png")
-
-                # 元の画像を読み込む
-                img = Image.open("./static/image/generate/aititle" + str(random_number) + ".png")
-
-                # 明るさを変更する
-                enhancer = ImageEnhance.Brightness(img)
-                factor = 1.5  # 明るくする割合
-                img = enhancer.enhance(factor)
-
-                # 保存する
-                img.save("./static/image/generate/brightened" + str(random_number) + ".png")
-
-
-                text3 = text
-
-                return render_template('result_aithumbnail.html', text=text,text3=text3, page_url=page_url ,select_font=select_font, select_colors=select_colors, random_number=str(random_number))
-
-
-
-
-
-
-        else:
-                # テキストを保存する
-                text = page_url
-                text2 = text
-
-
-                API_KEY = "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"
-                openai.api_key = API_KEY
-
-                def aithumb_generate_image_with_dalle2(prompt, path):
-                    response = openai.Image.create(
-                    prompt=prompt,
-                    n=1,
-                    size='{}x{}'.format(str(512), str(512))
-                    )
-                    image_url = response['data'][0]['url']
-
-                    response = requests.get(image_url)
-                    image = Image.open(BytesIO(response.content))
-                    image.save(path)
-
-                title_text = text
-                translator = Translator()
-                text_en = translator.translate(title_text, dest='en')
-                text_en = text_en.text
-                print(text_en)
-
-                image_url = aithumb_generate_image_with_dalle2(f'{text_en}', './static/image/generate/aititle' + str(random_number) + '.png')
-
-
-
-                # 画像を読み込む
-                img = Image.open("./static/image/generate/aititle" + str(random_number) + ".png")
-
-                # 画像を薄くする
-                img = img.point(lambda x: x * 0.3)
-
-                # 画像を保存する
-                img.save("./static/image/generate/weak" + str(random_number) + ".png")
-
-                # 下側に文字を描画する
-                img = Image.open("./static/image/generate/weak" + str(random_number) + ".png")
-                draw = ImageDraw.Draw(img)
-
-                text = title_text
-                font_size = 50
-                font_path = select_font
-                font = ImageFont.truetype(font_path, font_size)
-                text_width, text_height = draw.textsize(text, font)
-
-                x = (img.width - text_width) // 2
-                y = img.height - text_height - 50
-
-                while x < 0 or y < 0:
-                    font_size -= 1
-                    font = ImageFont.truetype(font_path, font_size)
-                    text_width, text_height = draw.textsize(text, font)
-                    x = (img.width - text_width) // 2
-                    y = img.height - text_height - 50
-
-                if select_color != (255, 255, 255):
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center', stroke_width=3, stroke_fill='white')
-                else:
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center')
-
-
-                img.save("./static/image/generate/weak_down" + str(random_number) + ".png")
-
-                # 上側に文字を描画する
-                img = Image.open("./static/image/generate/weak" + str(random_number) + ".png")
-                draw = ImageDraw.Draw(img)
-
-                text = title_text
-                font_size = 50
-                font_path = select_font
-                font = ImageFont.truetype(font_path, font_size)
-                text_width, text_height = draw.textsize(text, font)
-
-                x = (img.width - text_width) // 2
-                y = 50
-
-                while x < 0 or y < 0:
-                    font_size -= 1
-                    font = ImageFont.truetype(font_path, font_size)
-                    text_width, text_height = draw.textsize(text, font)
-                    x = (img.width - text_width) // 2
-                    y = 50
-
-                if select_color != (255, 255, 255):
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center', stroke_width=3, stroke_fill='white')
-                else:
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center')
-
-                img.save("./static/image/generate/weak_up" + str(random_number) + ".png")
-
-                # 中央に文字を描画する
-                img = Image.open("./static/image/generate/weak" + str(random_number) + ".png")
-                draw = ImageDraw.Draw(img)
-
-                text = title_text
-                font_size = 50
-                font_path = select_font
-                font = ImageFont.truetype(font_path, font_size)
-                text_width, text_height = draw.textsize(text, font)
-
-                x = (img.width - text_width) // 2
-                y = (img.height - text_height) // 2
-
-                while x < 0 or y < 0:
-                    font_size -= 1
-                    font = ImageFont.truetype(font_path, font_size)
-                    text_width, text_height = draw.textsize(text, font)
-                    x = (img.width - text_width) // 2
-                    y = (img.height - text_height) // 2
-
-                if select_color != (255, 255, 255):
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center', stroke_width=3, stroke_fill='white')
-                else:
-                    draw.multiline_text((x, y), text, font=font, fill=select_color, align='center')
-
-                img.save("./static/image/generate/weak_center" + str(random_number) + ".png")
-
-                
-
-
-                # 画像を読み込む
-                img = Image.open("./static/image/generate/aititle" + str(random_number) + ".png")
-
-                # 画像を白黒に変換する
-                img = img.convert('L')
-
-                # 画像を保存する
-                img.save("./static/image/generate/mono" + str(random_number) + ".png")
-
-
-                # 画像を読み込む
-                img = Image.open("./static/image/generate/aititle" + str(random_number) + ".png")
-
-
-                # 画像をぼかす
-                img = img.filter(ImageFilter.GaussianBlur(radius=10))
-
-                # 画像を保存する
-                img.save("./static/image/generate/aititle_resized_blur" + str(random_number) + ".png")
-
-                # 元の画像を読み込む
-                img = Image.open("./static/image/generate/aititle" + str(random_number) + ".png")
-
-                # 明るさを変更する
-                enhancer = ImageEnhance.Brightness(img)
-                factor = 1.5  # 明るくする割合
-                img = enhancer.enhance(factor)
-
-                # 保存する
-                img.save("./static/image/generate/brightened" + str(random_number) + ".png")
-
-
-
-
-
-
-                return render_template('result_aithumbnail.html', text=text,text2=text2,
-                 random_number=str(random_number), page_url=page_url, select_font=select_font, select_colors=select_colors)
-        
-
-from flask import Flask, render_template ,request, redirect, session
-import requests
-from bs4 import BeautifulSoup
-from html import escape
-from flask import make_response
-from make_cloud import create_cloud
-import os
-from googletrans import Translator
-import os
-import openai
-
-
-
-@app.route('/honyakuyouyaku')
-def honyakuyouyaku_index():
-    return render_template('index_honyakuyouyaku.html') #index.htmlを表示
-
-
-
-@app.route("/result_honyakuyouyaku",  methods=['GET', 'POST']) # POSTメソッドに対応した処理
-def honyakuyouyaku_insert():
+        # Get files
+        image_file = request.files.get('item_image')
+        image_file2 = request.files.get('item_image2')
+        image_file3 = request.files.get('item_image3')
+        image_file4 = request.files.get('item_image4')
+        image_file5 = request.files.get('item_image5')
+        image_file6 = request.files.get('item_image6')
+
+        # Check if each image_file is None
+        print(image_file)
+        print(image_file2)
+        print(image_file3)
+        print(image_file4)
+        print(image_file5)
+        print(image_file6)
+
+        # Do something for each file
+        for i, file in enumerate([image_file, image_file2, image_file3, image_file4, image_file5, image_file6]):
+            if file and file.filename.split('.')[-1] in ['png', 'jpeg', 'jpg']:
+                # Create file name
+                filename = "item_photo" + max_id + "_" + str(i + 1) + ".png"
+
+                # Open image
+                image = Image.open(file)
+
+                # Convert to PNG and save
+                image.save(os.path.join(app.static_folder, "image/generate", filename), 'png')
+        image_1 = f'<img width="60" height="60" class="rounded-2 " src="./static/image/generate/item_photo{max_id}_1.png" />'
+        image_2 = ""
+        if os.path.exists(os.path.join(app.static_folder, f"image/generate/item_photo{max_id}_2.png")):
+            image_2 = f'<img width="60" height="60" class="rounded-2" src="./static/image/generate/item_photo{max_id}_2.png" />'
+        image_3 = ""
+        if os.path.exists(os.path.join(app.static_folder, f"image/generate/item_photo{max_id}_3.png")):
+            image_3 = f'<img width="60" height="60" class="rounded-2" src="./static/image/generate/item_photo{max_id}_3.png" />'
+        image_4 = ""
+        if os.path.exists(os.path.join(app.static_folder, f"image/generate/item_photo{max_id}_4.png")):
+            image_4 = f'<img width="60" height="60" class="rounded-2" src="./static/image/generate/item_photo{max_id}_4.png" />'
+        image_5 = ""
+        if os.path.exists(os.path.join(app.static_folder, f"image/generate/item_photo{max_id}_5.png")):
+            image_5 = f'<img width="60" height="60" class="rounded-2" src="./static/image/generate/item_photo{max_id}_5.png" />'
+        image_6 = ""
+        if os.path.exists(os.path.join(app.static_folder, f"image/generate/item_photo{max_id}_6.png")):
+            image_6 = f'<img width="60" height="60" class="rounded-2" src="./static/image/generate/item_photo{max_id}_6.png" />'
+
+        create_movie(max_id, intro_text_data)
+
+        # your.htmlにリダイレクト
+        return redirect(f'/shop_page/{max_id}')
+
+@app.route('/shop_page/<int:max_id>')
+def shop_page(max_id):
+
+        conn = psycopg2.connect(
+            host="localhost",
+            database="moviec",
+            user="postgres",
+            password="seisei178"
+        )
+
+        cur = conn.cursor()
+
+        # idがmax_idの行を取得
+        cur.execute("SELECT * FROM moviec_table WHERE id=%s", (max_id,))
+        row = cur.fetchone()
+
+        cur.close()
+        conn.close()
+
+        # データの取得
+        item_name = row[1]
+        item_price = row[2]
+        item_quantity = row[3]
+        bottom_order = row[4]
+        top_order = row[5]
+        category = row[6]
+        ship_origin = row[7]
+        ship_days = row[8]
+        keywords = row[9]
+        item_detail = row[10]
+        target = row[11]
+        prompt = row[12]
+        intro_text_data = row[13]
+
+        image_1 = f'<img width="60" id="iamge_2" height="60" class="rounded-2 " src="/static/image/generate/item_photo{max_id}_1.png" />'
+        image_2 = ""
+        if os.path.exists(os.path.join(app.static_folder, f"image/generate/item_photo{max_id}_2.png")):
+            image_2 = f'<img width="60" id="iamge_2" height="60" class="rounded-2" src="/static/image/generate/item_photo{max_id}_2.png" />'
+        image_3 = ""
+        if os.path.exists(os.path.join(app.static_folder, f"image/generate/item_photo{max_id}_3.png")):
+            image_3 = f'<img width="60" id="iamge_2" height="60" class="rounded-2" src="/static/image/generate/item_photo{max_id}_3.png" />'
+        image_4 = ""
+        if os.path.exists(os.path.join(app.static_folder, f"image/generate/item_photo{max_id}_4.png")):
+            image_4 = f'<img width="60" id="iamge_2" height="60" class="rounded-2" src="/static/image/generate/item_photo{max_id}_4.png" />'
+        image_5 = ""
+        if os.path.exists(os.path.join(app.static_folder, f"image/generate/item_photo{max_id}_5.png")):
+            image_5 = f'<img width="60" id="iamge_2" height="60" class="rounded-2" src="/static/image/generate/item_photo{max_id}_5.png" />'
+        image_6 = ""
+        if os.path.exists(os.path.join(app.static_folder, f"image/generate/item_photo{max_id}_6.png")):
+            image_6 = f'<img width="60" id="iamge_2" height="60" class="rounded-2" src="/static/image/generate/item_photo{max_id}_6.png" />'
+        print(max_id)
+        return render_template('pro.html',item_name=item_name, item_price=item_price, category=category, 
+                            keywords=keywords, item_detail=Markup(item_detail), target=target,
+                            intro_text_data=intro_text_data, max_id=str(max_id), ship_origin=ship_origin, ship_days=ship_days,
+                            item_quantity=item_quantity, bottom_order=bottom_order, top_order=top_order, prompt=prompt,
+                            image_1=image_1, image_2=image_2, image_3=image_3, image_4=image_4, image_5=image_5, image_6=image_6)
+
+
+@app.route('/purchase', methods=['POST'])
+def purchase():
+    if 'username' not in session:
+        return redirect(url_for('login_page'))
+    
     if request.method == 'POST':
-        # index.htmlのフォームから質問文を入手する
-        page_url = escape(request.form['page_url'])
+        item_id = request.form['item_id']
+        item_name = request.form['item_name']
+        item_price = request.form['item_price']
+        item_quantity = request.form['item_quantity']
+        ship_days = request.form['ship_days']
+        ship_origin = request.form['ship_origin']
 
-        if page_url.startswith("http") or page_url.startswith("https"):
-    # スクレイピング処理
-
-            res = requests.get(page_url, headers={'Content-Type': 'text/html; charset=UTF-8'})
-            soup = BeautifulSoup(res.content, 'html.parser', from_encoding='utf-8')
-
-            for title in soup.find_all('title'):
-                title_text = title.text
-                translator = Translator()
-                title_text_ja = translator.translate(title_text, dest='ja')
-                title_text_ja = title_text_ja.text
-
-            # 指定されたURLからHTMLを取得
-            url = page_url
-            response = requests.get(url)
-
-            # 取得したHTMLを解析
-            soup = BeautifulSoup(response.content, 'html.parser')
-
-            # テキスト部分のみを抽出
-            text = ''
-            for paragraph in soup.find_all('p'):
-                text += paragraph.text
-
-            print(text)
-            import random
-
-            random_number = str(random.randint(0, 9999999999)).zfill(10)
-                        
-            API_KEY = "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"
-            openai.api_key = API_KEY
-
-            prompt = f"""
-            {text}
-            ↓↓↓
-            上記の英文を日本語で200文字ぐらいに要約してください。
-            """
+        return render_template('purchase.html', 
+                           username=session['username'], 
+                           item_id=item_id, 
+                           item_name=item_name, 
+                           item_price=item_price, 
+                           item_quantity=item_quantity, 
+                           ship_days=ship_days, 
+                           ship_origin=ship_origin)
 
 
+@app.route('/comp', methods=['POST'])
+def comp():
+    if 'username' not in session:
+        return redirect(url_for('login_page'))
+    
+    if request.method == 'POST':
 
-
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                max_tokens = 1000,
-                messages=[
-                    {"role": "user", "content": prompt},
-                ]
-            )
-
-            print(response)
-            summary_text_data = response['choices'][0]['message']['content']  
-            print(summary_text_data)
-  
-
-
-            import random
-            from wordcloud import WordCloud
-
-            # ランダムな6桁の数字を生成
-            random_number = str(random.randint(100000, 999999))
-
-            wordcloud = WordCloud(background_color="black", width=600, height=400, max_words=100 ).generate(text)
-
-            wordcloud.to_file("./static/image/wordcloud"+str(random_number)+".png")
-
-            page_title = summary_text_data
-            
-
-            page_url2 = page_url
-
-
-
-            return render_template('result_honyakuyouyaku.html', summary_text_data=summary_text_data, random_nubmer=str(random_number), page_url2=page_url2, title_text=title_text, title_text_ja=title_text_ja)
-
-
-
-
-
-
-        else:
-            # テキストを保存する
-            text = page_url
-
-            API_KEY = "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"
-            openai.api_key = API_KEY
-
-            prompt = f"""
-            {text}
-            ↓↓↓
-            上記の英文を日本語で200文字ぐらいに要約してください。
-            """
-
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                max_tokens = 1000,
-                messages=[
-                    {"role": "user", "content": prompt},
-                ]
-            )
-
-            print(response)
-            summary_text_data = response['choices'][0]['message']['content']  
-            print(summary_text_data)
-  
-            import random
-            from wordcloud import WordCloud
-
-            # ランダムな6桁の数字を生成
-            random_number = str(random.randint(100000, 999999))
-
-            wordcloud = WordCloud(background_color="black", width=600, height=400, max_words=100 ).generate(text)
-
-            wordcloud.to_file("./static/image/wordcloud"+str(random_number)+".png")
-
-            
-
-            return render_template('result_honyakuyouyaku.html', summary_text_data=summary_text_data, random_nubmer=str(random_number), page_url=page_url)
-
-
-@app.route('/schoolforce')
-def schoolforce_index():
-
-    return render_template('index_schoolforce.html')
-
-
-
-@app.route("/result_schoolforce",  methods=['GET', 'POST']) # POSTメソッドに対応した処理
-def schoolforce_insert():
-
-            if request.method == 'POST':
-                # index.htmlのフォームから質問文を入手する
-                import openai
-                import requests
-                from bs4 import BeautifulSoup
-
-                API_KEY = "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"
-                openai.api_key = API_KEY
-
-                page_url = request.form['title']
-                term = request.form['term']
-                length_text = request.form['length_text']
-                keywords = request.form['keywords']
-                language = request.form['language']
-                free_term = request.form['free_term']
-
-                if page_url.startswith("http") or page_url.startswith("https"):
-                # スクレイピング処理
-
-                    res = requests.get(page_url, headers={'Content-Type': 'text/html; charset=UTF-8'})
-                    soup = BeautifulSoup(res.content, 'html.parser', from_encoding='utf-8')
-
-                    for title in soup.find_all('title'):
-                        title_text = title.text
-
-                    # 指定されたURLからHTMLを取得
-                    url = page_url
-                    response = requests.get(url)
-
-                    # 取得したHTMLを解析
-                    soup = BeautifulSoup(response.content, 'html.parser')
-
-                    # テキスト部分のみを抽出
-                    text = ''
-                    for paragraph in soup.find_all('p'):
-                        text += paragraph.text
-
-                    if len(text) > 2000:
-                        text = text[:2000] + "..."
-                print(title_text)
-                print(text)
-
-                term = f"{term}"
-                length_text = f"{length_text}"
-                keywords = f"{keywords}"
-                free_term = f"{free_term}"
-                prompt = f"""
-                タイトル:「{title}」
-                詳細1:「{text}」
-                """
-
-
-
-                response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                     max_tokens = 1000,
-                    messages=[
-                        {"role": "user", "content": term},
-                        {"role": "user", "content": free_term},
-                        {"role": "user", "content": length_text},
-                        {"role": "user", "content": "キーワードは" + keywords},
-                        {"role": "user", "content": "言語は" + language + "で出力して。"},
-                        {"role": "assistant", "content": prompt},
-                    ],
-                )
-                print(response)
-                
-                song_text_data = response['choices'][0]['message']['content']  
-                print(song_text_data)
-
-                song_text_data = song_text_data.replace('\n', Markup('<br>'))
-                
-  
-
-                return render_template('result_schoolforce.html', text=text, page_url=page_url,
-                        song_text_data=Markup(song_text_data), prompt=prompt, title=title, title_text=title_text, term=term,
-                        free_term=free_term, length_text=length_text, keywords=keywords, language=language)
+        return render_template('comp.html', 
+                           username=session['username'])
+    
 
 if __name__ == '__main__':
     app.debug = True
