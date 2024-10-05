@@ -1,0 +1,818 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-60GWGE93ET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-60GWGE93ET');
+</script>
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <!-- Favicon-->
+      <link rel="icon" type="image/png" href="./static/logo_small_sukashi.png">
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+
+        <link href="/static/css/styles.css" rel="stylesheet" />
+         <title>AImoviEC-AIで商品紹介動画を生成-</title>
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+         <style>
+          #loading {
+              display: none;
+              position: absolute;
+              left: 50%;
+              top: 65%;
+              transform: translate(-50%, -50%);
+          }
+  
+          #loading-spinner {
+              border: 16px solid #f3f3f3; /* Light grey */
+              border-top: 16px solid #3498db; /* Blue */
+              border-radius: 50%;
+              width: 120px;
+              height: 120px;
+              animation: spin 1.0s linear infinite;
+          }
+  
+          @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+          }
+      </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark static-top">
+    <div class="container text-center">
+      <a class="navbar-brand" href="/">AImoviEC</a>
+    </div>
+  </nav>
+
+           <header class="bg-dark">
+            <div class="container position-relative">
+                <div class="row justify-content-center">
+                    <div class="col-xl-6">
+                        <div class="text-center text-white">
+
+                          <p>ようこそ, {{ username }}　さん! <a href="/logout">ログアウト</a></p>
+                          
+                            <h5 class="mb-5">商品の出品</h5>
+
+                            <form class="form-subscribe" id="myForm" action="/pro" method="post"  enctype="multipart/form-data">
+
+                              <label for="item_image" class="my-2">商品画像（必須）<span class="required" style="color: #ff5959;">*</span></label>
+                              <div class="image-container">
+                                <label for="fileInput" class="file-label">
+                                  <div class="file-icon">
+                                    <i class="bi bi-card-image"></i>
+                                  </div>
+                                </label>
+                                <input type="file" id="fileInput" name="item_image" accept="image/*" capture="user" required>
+                                <div id="image1"></div>
+                                
+                                <label for="fileInput2" class="file-label2">
+                                  <div class="file-icon2">
+                                    <i class="bi bi-card-image"></i>
+                                  </div>
+                                </label>
+                                <input type="file" id="fileInput2" name="item_image2" accept="image/*" capture="user">
+                                <div id="image2"></div>
+                                <label for="fileInput3" class="file-label3">
+                                  <div class="file-icon3">
+                                    <i class="bi bi-card-image"></i>
+                                  </div>
+                                </label>
+                                <input type="file" id="fileInput3" name="item_image3" accept="image/*" capture="user">
+                                <div id="image3"></div>
+                                
+                                <label for="fileInput4" class="file-label4">
+                                  <div class="file-icon4">
+                                    <i class="bi bi-card-image"></i>
+                                  </div>
+                                </label>
+                                <input type="file" id="fileInput4" name="item_image4" accept="image/*" capture="user">
+                                <div id="image4"></div>
+  
+  
+  
+                                <label for="fileInput5" class="file-label5">
+                                  <div class="file-icon5">
+                                    <i class="bi bi-card-image"></i>
+                                  </div>
+                                </label>
+                                <input type="file" id="fileInput5" name="item_image5" accept="image/*" capture="user">
+                                <div id="image5"></div>
+  
+                                <label for="fileInput6" class="file-label6">
+                                  <div class="file-icon6">
+                                    <i class="bi bi-card-image"></i>
+                                  </div>
+                                </label>
+                                <input type="file" id="fileInput6" name="item_image6" accept="image/*" capture="user">
+                                <div id="image6"></div>
+  </div>
+  
+  <style>
+    .image-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .file-label, .file-label2, .file-label3, .file-label4, .file-icon5, .file-icon6 {
+    display: flex;
+    align-items: center;
+  }
+  
+  .file-icon, .file-icon2, .file-icon3, .file-icon4, .file-icon5, .file-icon6 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 75px;
+    background-color: #9e9e9e;
+  }
+  .file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 75px;
+    background-color: #ff5959;
+  }
+  input[type="file"] {
+    display: none;
+  }
+  
+  
+  
+  </style>
+  
+  <script>
+  const fileInput = document.getElementById('fileInput');
+  const fileLabel = document.querySelector('.file-label');
+  const image1 = document.getElementById('image1');
+  let currentImage = null;
+  
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        // 選択された画像を表示する要素を作成
+        const img = document.createElement('img');
+        img.src = reader.result;
+        img.style.width = '75px';
+        img.style.height = '75px';
+        
+        // 前の画像がある場合、削除する
+        if (currentImage) {
+          image1.removeChild(currentImage);
+        }
+        currentImage = img;
+        
+        image1.appendChild(img);
+        fileLabel.style.display = 'none';
+      }
+      reader.readAsDataURL(file);
+      
+    }
+  });
+  
+  image1.addEventListener('click', () => {
+    fileInput.click();
+    if (currentImage) {
+      currentImage.style.display = 'none';
+      fileLabel.style.display = 'inline-block';
+    }
+  });
+  
+  
+  </script>
+  
+  <style>
+    .file-label {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    width: 75px;
+    height: 75px;
+    border: 1px dashed rgb(0, 0, 0);
+    text-align: center;
+    font-size: 14px;
+    line-height: 75px;
+  }
+  
+  .file-icon {
+    font-size: 30px;
+  }
+  
+  #fileInput {
+    display: none;
+  }
+  
+  </style>
+  
+  
+  
+  
+  <script>
+  const fileInput2 = document.getElementById('fileInput2');
+  const fileLabel2 = document.querySelector('.file-label2');
+  const image2 = document.getElementById('image2');
+  let currentImage2 = null;
+  
+  fileInput2.addEventListener('change', () => {
+  if (fileInput2.files.length > 0) {
+  const file = fileInput2.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+  // 選択された画像を表示する要素を作成
+  const img = document.createElement('img');
+  img.src = reader.result;
+  img.style.width = '75px';
+  img.style.height = '75px';
+  
+  // 前の画像がある場合、削除する
+  if (currentImage2) {
+  image2.removeChild(currentImage2);
+  }
+  currentImage2 = img;
+  
+  image2.appendChild(img);
+  fileLabel2.style.display = 'none';
+  }
+  reader.readAsDataURL(file);
+  
+  }
+  });
+  
+  image2.addEventListener('click', () => {
+  fileInput2.click();
+  if (currentImage2) {
+  currentImage2.style.display = 'none';
+  fileLabel2.style.display = 'inline-block';
+  }
+  });
+  
+  </script>
+  
+  <style>
+  .file-label2 {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  width: 75px;
+  height: 75px;
+  border: 1px dashed black;
+  text-align: center;
+  font-size: 14px;
+  line-height: 75px;
+  }
+  
+  .file-icon2 {
+  font-size: 30px;
+  }
+  
+  #fileInput2 {
+  display: none;
+  }
+  
+  </style>
+  
+  
+  
+  
+  <script>
+  const fileInput3 = document.getElementById('fileInput3');
+  const fileLabel3 = document.querySelector('.file-label3');
+  const image3 = document.getElementById('image3');
+  let currentImage3 = null;
+  
+  fileInput3.addEventListener('change', () => {
+  if (fileInput3.files.length > 0) {
+  const file = fileInput3.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+  // 選択された画像を表示する要素を作成
+  const img = document.createElement('img');
+  img.src = reader.result;
+  img.style.width = '75px';
+  img.style.height = '75px';
+  
+  // 前の画像がある場合、削除する
+  if (currentImage3) {
+  image3.removeChild(currentImage3);
+  }
+  currentImage3 = img;
+  
+  image3.appendChild(img);
+  fileLabel3.style.display = 'none';
+  }
+  reader.readAsDataURL(file);
+  
+  }
+  });
+  
+  image3.addEventListener('click', () => {
+  fileInput3.click();
+  if (currentImage3) {
+  currentImage3.style.display = 'none';
+  fileLabel3.style.display = 'inline-block';
+  }
+  });
+  
+  </script>
+  
+  <style>
+  .file-label3 {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  width: 75px;
+  height: 75px;
+  border: 1px dashed black;
+  text-align: center;
+  font-size: 14px;
+  line-height: 75px;
+  }
+  
+  .file-icon3 {
+  font-size: 30px;
+  }
+  
+  #fileInput3 {
+  display: none;
+  }
+  
+  </style>
+  
+  
+  
+  <script>
+  const fileInput4 = document.getElementById('fileInput4');
+  const fileLabel4 = document.querySelector('.file-label4');
+  const image4 = document.getElementById('image4');
+  let currentImage4 = null;
+  
+  fileInput4.addEventListener('change', () => {
+  if (fileInput4.files.length > 0) {
+  const file = fileInput4.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+  // 選択された画像を表示する要素を作成
+  const img = document.createElement('img');
+  img.src = reader.result;
+  img.style.width = '75px';
+  img.style.height = '75px';
+  
+  // 前の画像がある場合、削除する
+  if (currentImage4) {
+  image4.removeChild(currentImage4);
+  }
+  currentImage4 = img;
+  
+  image4.appendChild(img);
+  fileLabel4.style.display = 'none';
+  }
+  reader.readAsDataURL(file);
+  
+  }
+  });
+  
+  image4.addEventListener('click', () => {
+  fileInput4.click();
+  if (currentImage4) {
+  currentImage4.style.display = 'none';
+  fileLabel4.style.display = 'inline-block';
+  }
+  });
+  
+  </script>
+  
+  <style>
+  .file-label4 {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  width: 75px;
+  height: 75px;
+  border: 1px dashed black;
+  text-align: center;
+  font-size: 14px;
+  line-height: 75px;
+  }
+  
+  .file-icon4 {
+  font-size: 30px;
+  }
+  
+  #fileInput4 {
+  display: none;
+  }
+  
+  </style>
+  
+  
+  
+  <script>
+  const fileInput5 = document.getElementById('fileInput5');
+  const fileLabel5 = document.querySelector('.file-label5');
+  const image5 = document.getElementById('image5');
+  let currentImage5 = null;
+  
+  fileInput5.addEventListener('change', () => {
+  if (fileInput5.files.length > 0) {
+  const file = fileInput5.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+  // 選択された画像を表示する要素を作成
+  const img = document.createElement('img');
+  img.src = reader.result;
+  img.style.width = '75px';
+  img.style.height = '75px';
+  
+  // 前の画像がある場合、削除する
+  if (currentImage5) {
+  image5.removeChild(currentImage5);
+  }
+  currentImage5 = img;
+  
+  image5.appendChild(img);
+  fileLabel5.style.display = 'none';
+  }
+  reader.readAsDataURL(file);
+  
+  }
+  });
+  
+  image5.addEventListener('click', () => {
+  fileInput5.click();
+  if (currentImage5) {
+  currentImage5.style.display = 'none';
+  fileLabel5.style.display = 'inline-block';
+  }
+  });
+  
+  </script>
+  
+  <style>
+  .file-label5 {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  width: 75px;
+  height: 75px;
+  border: 1px dashed black;
+  text-align: center;
+  font-size: 14px;
+  line-height: 75px;
+  }
+  
+  .file-icon5 {
+  font-size: 30px;
+  }
+  
+  #fileInput5 {
+  display: none;
+  }
+  
+  </style>
+  
+  <script>
+    const fileInput6 = document.getElementById('fileInput6');
+    const fileLabel6 = document.querySelector('.file-label6');
+    const image6 = document.getElementById('image6');
+    let currentImage6 = null;
+    
+    fileInput6.addEventListener('change', () => {
+    if (fileInput6.files.length > 0) {
+    const file = fileInput6.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+    // 選択された画像を表示する要素を作成
+    const img = document.createElement('img');
+    img.src = reader.result;
+    img.style.width = '75px';
+    img.style.height = '75px';
+    
+    // 前の画像がある場合、削除する
+    if (currentImage6) {
+    image6.removeChild(currentImage6);
+    }
+    currentImage6 = img;
+    
+    image6.appendChild(img);
+    fileLabel6.style.display = 'none';
+    }
+    reader.readAsDataURL(file);
+    
+    }
+    });
+    
+    image6.addEventListener('click', () => {
+    fileInput6.click();
+    if (currentImage6) {
+    currentImage6.style.display = 'none';
+    fileLabel6.style.display = 'inline-block';
+    }
+    });
+    
+    </script>
+    
+    <style>
+    .file-label6 {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    width: 75px;
+    height: 75px;
+    border: 1px dashed black;
+    text-align: center;
+    font-size: 14px;
+    line-height: 75px;
+    }
+    
+    .file-icon6 {
+    font-size: 30px;
+    }
+    
+    #fileInput6 {
+    display: none;
+    }
+    
+    </style>
+
+
+
+
+
+
+                              <div class="col">
+                                  <label for="item_name" class="my-2 ">商品名（必須）<span class="required" style="color: #ff5959;">*</span></label>
+                                  <input maxlength="200" minlength="1" class="form-control form-control-lg" id="item_name" type="text" placeholder="商品名を入力(必須)" name="item_name" required value="" />
+                              </div>
+
+                               
+
+                              <label for="item_detail" class="my-2">商品説明</label>
+                              <textarea name="item_detail" id="item_detail"  class="form-control form-control-sm" placeholder="色、素材、重さ、定価、注意点など"  rows="4"　required ></textarea>
+
+                              <label for="category" class="my-2">カテゴリ（必須）<span class="required" style="color: #ff5959;">*</span></label>
+                              <select class="form-control form-control-sm" id="category" name="category"　required >
+                                <option value="">--選択してください--</option>
+                                <option value="レディース">レディース</option>
+                                <option value="メンズ">メンズ</option>
+                                <option value="ベビー・キッズ">ベビー・キッズ</option>
+                                <option value="インテリア・住まい・小物">インテリア・住まい・小物</option>
+                                <option value="本・音楽・ゲーム">本・音楽・ゲーム</option>
+                                <option value="おもちゃ・ホビー・グッズ">おもちゃ・ホビー・グッズ</option>
+                                <option value="コスメ・香水・美容">コスメ・香水・美容</option>
+                                <option value="家電・スマホ・カメラ">家電・スマホ・カメラ</option>
+                                <option value="スポーツ・レジャー">スポーツ・レジャー</option>
+                                <option value="ハンドメイド">ハンドメイド</option>
+                                <option value="チケット">チケット</option>
+                                <option value="自動車・オートバイ">自動車・オートバイ</option>
+                                <option value="その他">その他</option>
+                              </select>
+                              
+
+                              <label for="ship_origin" class="my-2">配送元の地域（必須）<span class="required" style="color: #ff5959;">*</span></label>
+                              <select class="form-control form-control-sm" id="ship_origin" name="ship_origin"　required >
+                                <option value="" selected>都道府県</option>
+                                <option value="北海道">北海道</option>
+                                <option value="青森県">青森県</option>
+                                <option value="岩手県">岩手県</option>
+                                <option value="宮城県">宮城県</option>
+                                <option value="秋田県">秋田県</option>
+                                <option value="山形県">山形県</option>
+                                <option value="福島県">福島県</option>
+                                <option value="茨城県">茨城県</option>
+                                <option value="栃木県">栃木県</option>
+                                <option value="群馬県">群馬県</option>
+                                <option value="埼玉県">埼玉県</option>
+                                <option value="千葉県">千葉県</option>
+                                <option value="東京都">東京都</option>
+                                <option value="神奈川県">神奈川県</option>
+                                <option value="新潟県">新潟県</option>
+                                <option value="富山県">富山県</option>
+                                <option value="石川県">石川県</option>
+                                <option value="福井県">福井県</option>
+                                <option value="山梨県">山梨県</option>
+                                <option value="長野県">長野県</option>
+                                <option value="岐阜県">岐阜県</option>
+                                <option value="静岡県">静岡県</option>
+                                <option value="愛知県">愛知県</option>
+                                <option value="三重県">三重県</option>
+                                <option value="滋賀県">滋賀県</option>
+                                <option value="京都府">京都府</option>
+                                <option value="大阪府">大阪府</option>
+                                <option value="兵庫県">兵庫県</option>
+                                <option value="奈良県">奈良県</option>
+                                <option value="和歌山県">和歌山県</option>
+                                <option value="鳥取県">鳥取県</option>
+                                <option value="島根県">島根県</option>
+                                <option value="岡山県">岡山県</option>
+                                <option value="広島県">広島県</option>
+                                <option value="山口県">山口県</option>
+                                <option value="徳島県">徳島県</option>
+                                <option value="香川県">香川県</option>
+                                <option value="愛媛県">愛媛県</option>
+                                <option value="高知県">高知県</option>
+                                <option value="福岡県">福岡県</option>
+                                <option value="佐賀県">佐賀県</option>
+                                <option value="長崎県">長崎県</option>
+                                <option value="熊本県">熊本県</option>
+                                <option value="大分県">大分県</option>
+                                <option value="宮崎県">宮崎県</option>
+                                <option value="鹿児島県">鹿児島県</option>
+                                <option value="沖縄県">沖縄県</option>
+                              </select>
+
+                              <label for="ship_days" class="my-2">発送までの日数</label>
+                              <select class="form-control form-control-sm" id="ship_days" name="ship_days"　required >
+                                <option value="1~2日で発送" selected>1~2日で発送</option>
+                                <option value="2~3日で発送">2~3日で発送</option>
+                                <option value="4~7日で発送">4~7日で発送</option>
+                              </select>
+
+                              <label for="price" class="my-2">販売価格(円)<span class="required" style="color: #ff5959;">*</span></label>
+                              <input maxlength="100" minlength="1" class="form-control form-control-sm " id="price" type="text" placeholder="価格を入力(半角数字)" name="item_price" value="" oninput="value = value.replace(/[^0-9]+/i,''); updateCommissionAndProfit();" 　required />
+                              
+                              <div class="my-2">販売手数料：￥<span id="commission">0</span>円</div>
+                              <div class="my-2">販売利益：￥<span id="profit">0</span>円</div>
+                              <script>
+                              function updateCommissionAndProfit() {
+                                const priceInput = document.getElementById("price");
+                                const commissionElement = document.getElementById("commission");
+                                const profitElement = document.getElementById("profit");
+                                const price = parseInt(priceInput.value);
+                                const commission = Math.floor(price * 0.1);
+                                const profit = price - commission;
+                                commissionElement.textContent = commission;
+                                profitElement.textContent = profit;
+                              }
+                              </script>
+
+                              <label for="quantity" class="my-2">数量(個)<span class="required" style="color: #ff5959;">*</span></label>
+                              <input maxlength="100" minlength="1" class="form-control form-control-sm " id="quantity" type="text" placeholder="数量を入力(半角数字)" name="item_quantity" value="" oninput="value = value.replace(/[^0-9]+/i,'');" 　required />
+                                                                    
+                              <label for="bottom_order" class="my-2">最低注文数(個)<span class="required" style="color: #ff5959;">*</span></label>
+                              <input maxlength="100" minlength="1" class="form-control form-control-sm " id="bottom_order" type="text" placeholder="最低注文数を入力(半角数字)" name="bottom_order" value="" oninput="value = value.replace(/[^0-9]+/i,'');" 　required />
+
+                              <label for="top_order" class="my-2">最高注文数(個)<span class="required" style="color: #ff5959;">*</span></label>
+                              <input maxlength="100" minlength="1" class="form-control form-control-sm " id="top_order" type="text" placeholder="最高注文数を入力(半角数字)" name="top_order" value="" oninput="value = value.replace(/[^0-9]+/i,'');" 　required />
+
+                              <button type="button" class="btn btn-secondary my-2" onclick="toggleAdvanced()">高度な条件</button>
+<div id="advanced-form" style="display: none;">
+                    
+
+                              <label for="target" class="my-2">ターゲット層(任意)</label>
+                              <input maxlength="100" minlength="1" class="form-control form-control-sm" id="target" type="text" placeholder="ターゲット層を入力" name="target" 
+                              value="" />
+                              
+                              <label for="keywords" class="my-2">キーワード</label>
+                              <input maxlength="100" minlength="1" class="form-control form-control-sm" id="keywords" type="text" placeholder="キーワードを入力" name="keywords" 
+                              value="" />
+  
+
+</div>
+
+<script>
+function toggleAdvanced() {
+  const advancedForm = document.getElementById("advanced-form");
+  if (advancedForm.style.display === "none") {
+    advancedForm.style.display = "block";
+  } else {
+    advancedForm.style.display = "none";
+  }
+}
+</script>
+
+
+                              <div class="row justify-content-center">
+                                <div class="col-auto">
+                                  <input class="btn btn-primary" id="submitButton" type="submit" value="ショップを生成" style="margin-top: 10px; ">
+                                </div>
+                              </div>
+                              <div class="loader" style="margin-top: 10px;"></div></div>
+                              <p class="loader2 lead " style="margin-top: 5px; display:none;"></p>
+                          <div class="loading2"></div>                      
+                          <p class="loader2 lead " style="margin-top: 5px;">約30秒で完成します。しばらくお待ちください。</p>
+                          <p class="loader2 lead " style="margin-top: 5px;">※商品説明を記述することで正確な紹介文を生成できます。</p>
+                          <h2 class="mb-2">結果</h2>
+                                                    <div id="loading">
+                              <div id="loading-spinner"></div>
+                          </div><br><br>
+                                  
+
+                          </div>
+                              </div>
+
+                       <style>                              
+                        .loading2 {
+border: 6px solid #f3f3f3;
+border-top: 6px solid #3498db;
+border-radius: 50%;
+width: 50px;
+height: 50px;
+animation: spin 1s linear infinite;
+display: none; /* 初期状態では非表示 */
+}
+
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
+
+/* ボタンがクリックされた時に.loaderを表示 */
+#submitButton:active + .loading2 {
+display: inline-block;
+}
+
+</style>
+
+<style>                              
+    .loader {
+border: 6px solid #f3f3f3;
+border-top: 6px solid #3498db;
+border-radius: 50%;
+width: 50px;
+height: 50px;
+animation: spin 1s linear infinite;
+display: none; /* 初期状態では非表示 */
+}
+
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
+
+/* ボタンがクリックされた時に.loaderを表示 */
+#submitButton:active + .loader {
+display: inline-block;
+}
+
+</style>
+<script>
+let i = 0;
+
+const typing = () => {
+if (i < text.length) {
+document.querySelector(".loader2").innerHTML += text.charAt(i);
+i++;
+setTimeout(typing, 100);
+}
+};
+
+const loader2 = document.querySelector(".loader2");
+loader2.style.display = "none"; // hide loader2 initially
+
+const submitButton = document.getElementById("submitButton");
+submitButton.addEventListener("click", function() {
+const loader = document.querySelector(".loader");
+loader.style.display = "inline-block"; // show loader
+
+setTimeout(function() {
+loader2.style.display = "block"; // show loader2 after 1 second
+setTimeout(typing, 1000); // start typing after 1 second
+}, 1000);
+});
+</script>
+
+
+
+                                      
+                  </div>
+              </div>
+          </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div></div>
+            
+        </header>   
+
+      </main> 
+
+    
+
+
+
+      
+    </body>
+
+</html>
+
+

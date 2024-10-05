@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-60GWGE93ET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+r
+  gtag('config', 'G-60GWGE93ET');
+</script>
+
+<meta property="og:title" content="StoriesAI" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="StoriesAI-あなただけの物語をAIで創作-" />
+<meta property="og:url" content="https://www.aisakkyoku.com/storiesai" />
+<meta property="og:site_name" content="StoriesAI" />
+<meta property="og:image" content="https://www.aisakkyoku.com/static/space_yuenchi.png" />
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <!-- Favicon-->
+      <link rel="icon" type="image/png" href="./static/logo_small_sukashi.png">
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+
+        <link href="/static/css/styles.css" rel="stylesheet" />
+         <title>AImoviEC-AIで商品紹介動画を生成-</title>
+         <script sc="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <meta charset="UTF-8">
+    <title>購入確認</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            border-collapse: collapse;
+            margin-bottom: 2em;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        a {
+            color: #333;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #4CAF50;
+        }
+
+        
+        /* ... previous styles ... */
+
+        /* Additional styles for credit card form */
+        .credit-card-form {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+            margin-bottom: 2em;
+        }
+        .credit-card-form input {
+            margin-bottom: 1em;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+    </style>
+</head>  
+<nav class="navbar navbar-dark bg-dark static-top">
+    <div class="container text-center">
+      <a class="navbar-brand" href="/">AImoviEC</a>
+    </div>
+  </nav>
+<body>
+
+    <h1>購入確認</h1>
+<p>{{ username }}　さん!</p><p><a href="/logout">ログアウト</a></p>
+    <table>
+        <tr>
+            <th>商品名</th>
+            <td>{{ item_name }}</td>
+        </tr>
+        <tr>
+            <th>価格</th>
+            <td>{{ item_price }}</td>
+        </tr>
+        <tr>
+            <th>数量</th>
+            <td>{{ item_quantity }}</td>
+        </tr>
+        <tr>
+            <th>発送日数</th>
+            <td>{{ ship_days }}</td>
+        </tr>
+        <tr>
+            <th>発送元</th>
+            <td>{{ ship_origin }}</td>
+        </tr>
+    </table>
+
+    
+
+    <form action="/comp" method="post">
+        <input type="hidden" name="item_id" value="{{ item_id }}">
+        <input type="hidden" name="item_name" value="{{ item_name }}">
+        <input type="hidden" name="item_price" value="{{ item_price }}">
+        <input type="hidden" name="item_quantity" value="{{ item_quantity }}">
+        <input type="hidden" name="ship_days" value="{{ ship_days }}">
+        <input type="hidden" name="ship_origin" value="{{ ship_origin }}">
+
+            <!-- Credit card form -->
+    <div class="credit-card-form">
+        <h2>クレジットカード情報</h2>
+        <input type="text" name="card_number" placeholder="カード番号" pattern="\d*" minlength="16" maxlength="16" required>
+        <input type="text" name="card_expiration" placeholder="有効期限 MM/YY" pattern="\d{2}\/\d{2}" required>
+        <input type="text" name="card_cvv" placeholder="CVV" pattern="\d*" minlength="3" maxlength="4" required>
+    </div>
+        <button type="submit">購入する</button>
+
+    </form>
+
+
+</body>
+</html>
